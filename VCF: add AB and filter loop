@@ -1,0 +1,36 @@
+
+gzip *.vcf
+ls *.vcf.gz > samples.txt
+ls
+
+while read f; do \
+bcftools query -f'%CHROM\t%POS\t%REF\t%ALT\t[%AD]\t[%DP]\n' ${f} | awk -v OFS='\t' '{split($5, ad, ","); AB = ($6 != 0) ? ad[2] / $6 : "0"; print $1, $2, $3, $4, AB}' | bgzip -c > annot.txt.gz && \
+tabix -s1 -b2 -e2 -f annot.txt.gz && \
+echo -e '##INFO=<ID=AB,Number=1,Type=Integer,Description="Allelic ratio">' > hdr.txt && \
+bcftools annotate -a annot.txt.gz -h hdr.txt -c CHROM,POS,REF,ALT,AB ${f} > ${f}_annotated.vcf && \
+sed -i -e 's/INFO=<ID=AB,Number=1/INFO=<ID=AB,Number=A/g'  ${f}_annotated.vcf && \
+bcftools view -i 'INFO/AB > 0.3' -o  ${f}_filtered.vcf  ${f}_annotated.vcf ; done < samples.txt
+
+ls
+
+
+#Checking this 
+
+
+less *filtered* | wc -l >> comparison.txt
+less *annotated* | wc -l >> comparison.txt
+
+
+#If reasonable some closeups on files 
+#Check that Exomiser is able to run these
+#Look at results
+#then I should figure out how to do this on all VCFs we have for Exomiser
+
+
+REF	ALT	DP	Conclusion on variant
+0	0	0	Nothing
+10	0	10	Nothing
+0	10	10	AR
+10	10	20	AD
+10	5	15	AD
+5	10	15	AR
