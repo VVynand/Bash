@@ -1,0 +1,5 @@
+#Sed command combined with excel concat
+
+sed -i -e 's/SAMPLENAME/1234/g' 1234.yml
+
+#Modify several files at once by having a list of files to apply sed with, concatenate command with names
