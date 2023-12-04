@@ -1,0 +1,3 @@
+ls *.vcf > vcfs.txt
+
+while read f; do gatk VariantsToTable -V ${f} -F CHROM -F POS -F ID -F REF -F ALT -F QUAL -F FILTER -F Exomiser -F AB -GF GT -GF AD -GF DP -GF DP -GF GQ -GF PL -O ${f}.tsv ; done < vcfs.txt
